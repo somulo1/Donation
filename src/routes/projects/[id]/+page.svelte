@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
-  import { Heart, Users, Target, Calendar, ArrowLeft } from 'lucide-svelte';
+  import { Heart, Users, Calendar, ArrowLeft } from 'lucide-svelte';
   import { toasts } from '$lib/stores';
   import DonationForm from '$lib/components/DonationForm.svelte';
   import type { Project } from '$lib/types';
@@ -178,12 +178,41 @@
                 <div class="space-y-3">
                   {#each recentDonations as donation}
                     <div class="flex items-center justify-between py-3 border-b border-dark-200 dark:border-dark-700 last:border-b-0">
-                      <div>
-                        <div class="font-medium text-dark-900 dark:text-white">
-                          {donation.donor_name}
+                      <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0">
+                          {#if donation.donor_name === 'Anonymous'}
+                            <!-- Special Anonymous Badge -->
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                              </svg>
+                            </div>
+                          {:else}
+                            <!-- Named Donor Badge -->
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
+                              <span class="text-white font-medium text-sm">
+                                {donation.donor_name.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          {/if}
                         </div>
-                        <div class="text-sm text-dark-500 dark:text-dark-400">
-                          {formatDate(donation.created_at)}
+                        <div>
+                          <div class="flex items-center space-x-2">
+                            <span class="font-medium text-dark-900 dark:text-white">
+                              {donation.donor_name}
+                            </span>
+                            {#if donation.donor_name === 'Anonymous'}
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900/30 dark:to-pink-900/30 dark:text-purple-300">
+                                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                                </svg>
+                                Kind Heart
+                              </span>
+                            {/if}
+                          </div>
+                          <div class="text-sm text-dark-500 dark:text-dark-400">
+                            {formatDate(donation.created_at)}
+                          </div>
                         </div>
                       </div>
                       <div class="font-semibold text-primary-600 dark:text-primary-400">
