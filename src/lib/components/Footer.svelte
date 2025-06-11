@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Heart, Mail, Shield, MessageCircle, Facebook, Instagram } from 'lucide-svelte';
+  import { Mail, Shield, Facebook, Instagram } from 'lucide-svelte';
   import { siteSettings } from '$lib/stores';
   import { onMount } from 'svelte';
 
@@ -21,8 +21,20 @@
         <!-- Brand -->
         <div class="col-span-1 md:col-span-2 text-center md:text-left">
           <div class="flex items-center justify-center md:justify-start space-x-2 mb-4">
-            <div class="p-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg">
-              <Heart class="w-6 h-6 text-white" />
+            <div class="p-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-lg shadow-lg">
+              <!-- Custom Donation Icon: Hands with Heart -->
+              <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <!-- Giving hands -->
+                <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2Z"/>
+                <!-- Heart in center -->
+                <path d="M12 8.5C10.5 8.5 9.3 9.7 9.3 11.2C9.3 13.2 12 16 12 16S14.7 13.2 14.7 11.2C14.7 9.7 13.5 8.5 12 8.5Z"/>
+                <!-- Left hand -->
+                <path d="M6 10C4.9 10 4 10.9 4 12V16C4 17.1 4.9 18 6 18H8V10H6Z"/>
+                <!-- Right hand -->
+                <path d="M18 10C19.1 10 20 10.9 20 12V16C20 17.1 19.1 18 18 18H16V10H18Z"/>
+                <!-- Connection lines -->
+                <path d="M8 12H10M14 12H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
             </div>
             <span class="font-display font-bold text-xl gradient-text">
               <a href="/">{$siteSettings.platform_name || 'DonateAnon'}</a>

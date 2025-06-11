@@ -7,6 +7,7 @@
   export let checkoutRequestId: string;
   export let amount: number;
   export let projectTitle: string;
+  export let demoMode: boolean = false;
 
   const dispatch = createEventDispatcher();
 
@@ -26,14 +27,14 @@
       checkPaymentStatus();
     }, 3000);
 
-    // Auto-timeout after 2 minutes
+    // Auto-timeout after 5 minutes
     setTimeout(() => {
       if (status === 'processing') {
         status = 'timeout';
         message = 'Payment timeout. Please try again.';
         clearInterval(interval);
       }
-    }, 120000);
+    }, 300000);
   });
 
   onDestroy(() => {
@@ -47,26 +48,28 @@
 
     try {
       checking = true;
-      
+
+      // Check donation status using the donations API
       const response = await fetch(`/api/donations/status?donation_id=${donationId}&checkout_request_id=${checkoutRequestId}`);
       const result = await response.json();
 
+      console.log('Payment status check result:', result);
+
       if (result.success) {
-        status = result.status;
-        message = result.message;
-        remainingTime = result.remaining_time || 0;
+        if (result.status === 'completed') {
+          status = 'completed';
+          message = result.message || 'Payment completed successfully!';
 
-        if (result.donation?.transaction_id) {
-          transactionId = result.donation.transaction_id;
-        }
+          if (result.donation?.transaction_id || result.donation?.mpesa_transaction_id) {
+            transactionId = result.donation.transaction_id || result.donation.mpesa_transaction_id;
+          }
 
-        if (status === 'completed') {
           clearInterval(interval);
           toasts.add({
             type: 'success',
             message: 'Payment completed successfully! Thank you for your donation.'
           });
-          
+
           // Dispatch success event after a short delay to show success state
           setTimeout(() => {
             dispatch('success', {
@@ -75,16 +78,29 @@
               amount
             });
           }, 2000);
-        } else if (status === 'failed') {
+        } else if (result.status === 'pending' || result.status === 'processing') {
+          // Still pending, continue checking
+          message = result.message || 'Please complete the payment on your phone';
+          remainingTime = result.remaining_time || 0;
+          console.log('Payment still pending, continuing to check...');
+        } else {
+          // Failed, cancelled, expired, etc.
+          status = 'failed';
+          message = result.message || 'Payment failed. Please try again.';
+
           clearInterval(interval);
           toasts.add({
             type: 'error',
-            message: 'Payment failed. Please try again.'
+            message: result.message || 'Payment failed. Please try again.'
           });
         }
+      } else {
+        // API call failed, but don't immediately mark as failed
+        console.log('Status check API failed, will retry:', result.error);
       }
     } catch (error) {
       console.error('Error checking payment status:', error);
+      // Don't mark as failed on network errors, just continue checking
     } finally {
       checking = false;
     }
@@ -122,11 +138,18 @@
             <Smartphone class="absolute inset-0 m-auto w-8 h-8 text-primary-600" />
           </div>
           <h3 class="font-display text-xl font-semibold text-dark-900 dark:text-white mb-2">
-            Complete Payment on Your Phone
+            {demoMode ? 'Demo Payment Processing' : 'Complete Payment on Your Phone'}
           </h3>
           <p class="text-dark-600 dark:text-dark-400 mb-4">
             {message}
           </p>
+          {#if demoMode}
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 mb-4">
+              <p class="text-sm text-blue-800 dark:text-blue-200">
+                <strong>Demo Mode:</strong> This is a demonstration payment. In real mode, you would receive an M-Pesa prompt on your phone.
+              </p>
+            </div>
+          {/if}
           <div class="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4 mb-4">
             <p class="text-sm text-primary-800 dark:text-primary-200">
               <strong>Amount:</strong> {formatCurrency(amount)}<br>
@@ -145,13 +168,13 @@
             <div class="w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center">
               <CheckCircle class="w-4 h-4 text-white" />
             </div>
-            <span>M-Pesa prompt sent to your phone</span>
+            <span>{demoMode ? 'Demo payment initiated' : 'M-Pesa prompt sent to your phone'}</span>
           </div>
           <div class="flex items-center space-x-3 text-sm text-dark-600 dark:text-dark-400">
             <div class="w-6 h-6 rounded-full border-2 border-primary-600 flex items-center justify-center">
               <Clock class="w-4 h-4 text-primary-600 animate-pulse" />
             </div>
-            <span>Enter your M-Pesa PIN to complete</span>
+            <span>{demoMode ? 'Payment will complete automatically in 10 seconds' : 'Enter your M-Pesa PIN to complete'}</span>
           </div>
         </div>
 

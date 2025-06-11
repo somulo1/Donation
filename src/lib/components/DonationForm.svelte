@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import { X, Heart, Phone, User, Mail, CreditCard } from 'lucide-svelte';
+  import { X, Heart, Phone, User, CreditCard } from 'lucide-svelte';
   import { toasts, loading } from '$lib/stores';
   import PaymentStatus from './PaymentStatus.svelte';
   import type { Project } from '$lib/types';
@@ -12,7 +12,6 @@
   let formData = {
     amount: '',
     donor_name: '',
-    donor_email: '',
     phone_number: ''
   };
 
@@ -23,7 +22,8 @@
     donationId: 0,
     checkoutRequestId: '',
     amount: 0,
-    projectTitle: ''
+    projectTitle: '',
+    demoMode: false
   };
 
   const predefinedAmounts = [500, 1000, 2500, 5000, 10000];
@@ -48,10 +48,7 @@
       errors.phone_number = 'Please enter a valid Kenyan phone number (e.g., 0712345678)';
     }
 
-    // Validate email if provided
-    if (formData.donor_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.donor_email)) {
-      errors.donor_email = 'Please enter a valid email address';
-    }
+
 
     return Object.keys(errors).length === 0;
   }
@@ -76,7 +73,6 @@
         project_id: project.id,
         amount: parseFloat(formData.amount),
         donor_name: formData.donor_name || null,
-        donor_email: formData.donor_email || null,
         phone_number: formatPhoneNumber(formData.phone_number)
       };
 
@@ -96,13 +92,16 @@
           donationId: result.donation_id,
           checkoutRequestId: result.checkout_request_id,
           amount: parseFloat(formData.amount),
-          projectTitle: project.title
+          projectTitle: project.title,
+          demoMode: result.demo_mode || false
         };
         showPaymentStatus = true;
 
         toasts.add({
           type: 'info',
-          message: 'M-Pesa prompt sent to your phone. Please enter your PIN to complete the payment.'
+          message: result.demo_mode
+            ? 'Demo payment initiated. Your payment will be automatically completed in 10 seconds.'
+            : 'M-Pesa prompt sent to your phone. Please enter your PIN to complete the payment.'
         });
       } else {
         toasts.add({
@@ -269,55 +268,30 @@
         </p>
       </div>
 
-      <!-- Optional Fields -->
+      <!-- Optional Donor Name -->
       <div class="mb-6">
-        <h4 class="text-sm font-medium text-dark-700 dark:text-dark-300 mb-3">
-          Optional Information
-        </h4>
-        
-        <!-- Donor Name -->
-        <div class="mb-4">
-          <label for="name" class="block text-sm text-dark-600 dark:text-dark-400 mb-2">
-            Your Name (leave blank to remain anonymous)
-          </label>
-          <div class="relative">
-            <User class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
-            <input
-              id="name"
-              type="text"
-              placeholder="Anonymous"
-              bind:value={formData.donor_name}
-              class="input-field pl-10"
-            />
-          </div>
+        <label for="name" class="block text-sm text-dark-600 dark:text-dark-400 mb-2">
+          Your Name (optional - leave blank to remain anonymous)
+        </label>
+        <div class="relative">
+          <User class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
+          <input
+            id="name"
+            type="text"
+            placeholder="Anonymous"
+            bind:value={formData.donor_name}
+            class="input-field pl-10"
+          />
         </div>
-
-        <!-- Email -->
-        <div class="mb-4">
-          <label for="email" class="block text-sm text-dark-600 dark:text-dark-400 mb-2">
-            Email (for donation receipt)
-          </label>
-          <div class="relative">
-            <Mail class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-dark-400" />
-            <input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
-              bind:value={formData.donor_email}
-              class="input-field pl-10"
-              class:border-red-500={errors.donor_email}
-            />
-          </div>
-          {#if errors.donor_email}
-            <p class="text-red-600 text-sm mt-1">{errors.donor_email}</p>
-          {/if}
-        </div>
+        <p class="text-xs text-dark-500 dark:text-dark-400 mt-1">
+          If left blank, your donation will be recorded as "Anonymous"
+        </p>
       </div>
 
       <!-- Privacy Notice -->
-      <div class="mb-6 p-4 bg-primary-50 dark:bg-primary-900/20 rounded-lg border border-primary-200 dark:border-primary-800">
-        <p class="text-sm text-primary-800 dark:text-primary-200">
-          <strong>Privacy:</strong> Your donation is anonymous by default. Personal information is only used for payment processing and will not be shared publicly.
+      <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+        <p class="text-sm text-green-800 dark:text-green-200">
+          <strong>🔒 Complete Privacy:</strong> Your phone number is only used for M-Pesa payment processing and is never stored in our database. Only your donation amount and optional name (or "Anonymous") are recorded. No personal contact information is saved.
         </p>
       </div>
 
@@ -351,6 +325,7 @@
     checkoutRequestId={paymentData.checkoutRequestId}
     amount={paymentData.amount}
     projectTitle={paymentData.projectTitle}
+    demoMode={paymentData.demoMode}
     on:success={handlePaymentSuccess}
     on:retry={handlePaymentRetry}
     on:close={handlePaymentClose}
