@@ -285,9 +285,6 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-dark-500 dark:text-dark-400 uppercase tracking-wider">
                 Date
               </th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-dark-500 dark:text-dark-400 uppercase tracking-wider">
-                Actions
-              </th>
             </tr>
           </thead>
           <tbody class="bg-white dark:bg-dark-800 divide-y divide-dark-200 dark:divide-dark-700">
@@ -296,15 +293,35 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
-                      <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
-                        <span class="text-white font-medium text-sm">
-                          {donation.donor_name.charAt(0)}
-                        </span>
-                      </div>
+                      {#if donation.donor_name === 'Anonymous'}
+                        <!-- Special Anonymous Badge -->
+                        <div class="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
+                      {:else}
+                        <!-- Named Donor Badge -->
+                        <div class="h-10 w-10 rounded-full bg-gradient-to-r from-primary-500 to-secondary-500 flex items-center justify-center">
+                          <span class="text-white font-medium text-sm">
+                            {donation.donor_name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      {/if}
                     </div>
                     <div class="ml-4">
-                      <div class="text-sm font-medium text-dark-900 dark:text-white">
-                        {donation.donor_name}
+                      <div class="flex items-center space-x-2">
+                        <span class="text-sm font-medium text-dark-900 dark:text-white">
+                          {donation.donor_name}
+                        </span>
+                        {#if donation.donor_name === 'Anonymous'}
+                          <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 dark:from-purple-900/30 dark:to-pink-900/30 dark:text-purple-300">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
+                            </svg>
+                            Kind Heart
+                          </span>
+                        {/if}
                       </div>
                     </div>
                   </div>
@@ -329,14 +346,6 @@
                     <Calendar class="w-4 h-4" />
                     <span>{formatDate(donation.created_at)}</span>
                   </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button 
-                    class="p-2 text-dark-400 hover:text-primary-600 transition-colors duration-200"
-                    title="View Details"
-                  >
-                    <Eye class="w-4 h-4" />
-                  </button>
                 </td>
               </tr>
             {/each}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { Settings, Save, RefreshCw, Shield } from 'lucide-svelte';
+  import { Settings, Save, RefreshCw, Shield, TestTube } from 'lucide-svelte';
   import { toasts, siteSettings } from '$lib/stores';
 
   let settings = {
@@ -9,15 +9,18 @@
     contact_email: 'admin@donateanon.com',
     mpesa_business_code: '174379',
     mpesa_environment: 'sandbox',
+    mpesa_consumer_key: 'uNzRpYZ8BOAQApcpuUax9WUi3cA9GqMviC0P0vUug8bGR4yT',
+    mpesa_consumer_secret: 'lddErn3XqkaJHWMm2zSz9o2UFADahr3Rl4L1dnbTRNGi3R7n3eJ2tNMRufbaCHTB',
+    mpesa_passkey: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+    deposit_phone_number: '254712345678',
     enable_notifications: true,
     auto_approve_projects: false,
-    minimum_donation: 10,
-    maximum_donation: 1000000,
     featured_projects_limit: 3
   };
 
   let saving = false;
   let loading = true;
+  let testing = false;
 
   onMount(async () => {
     await loadSettings();
@@ -74,6 +77,34 @@
       });
     } finally {
       saving = false;
+    }
+  }
+
+  async function testMpesaConfiguration() {
+    try {
+      testing = true;
+
+      const response = await fetch('/api/mpesa/test');
+      const result = await response.json();
+
+      if (result.success) {
+        toasts.add({
+          type: 'success',
+          message: 'M-Pesa configuration test successful!'
+        });
+      } else {
+        toasts.add({
+          type: 'error',
+          message: `M-Pesa test failed: ${result.error}`
+        });
+      }
+    } catch (error) {
+      toasts.add({
+        type: 'error',
+        message: 'Failed to test M-Pesa configuration'
+      });
+    } finally {
+      testing = false;
     }
   }
 
@@ -236,55 +267,131 @@
           </h3>
         </div>
 
-        <div class="space-y-4">
-          <div>
-            <label for="mpesa-business-code" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
-              Mpesa Business Code
-            </label>
-            <input
-              id="mpesa-business-code"
-              type="text"
-              bind:value={settings.mpesa_business_code}
-              class="input-field"
-              placeholder="174379"
-            />
+        <div class="space-y-6">
+          <!-- M-Pesa API Configuration -->
+          <div class="bg-dark-50 dark:bg-dark-700 rounded-lg p-4">
+            <h4 class="font-medium text-dark-900 dark:text-white mb-3">M-Pesa API Configuration</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="mpesa-business-code" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Business Short Code
+                </label>
+                <input
+                  id="mpesa-business-code"
+                  type="text"
+                  bind:value={settings.mpesa_business_code}
+                  class="input-field"
+                  placeholder="174379"
+                />
+                <p class="text-xs text-dark-500 dark:text-dark-400 mt-1">
+                  Your M-Pesa business shortcode for receiving payments
+                </p>
+              </div>
+
+              <div>
+                <label for="mpesa-environment" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Environment
+                </label>
+                <select id="mpesa-environment" bind:value={settings.mpesa_environment} class="input-field">
+                  <option value="sandbox">Sandbox (Testing)</option>
+                  <option value="production">Production (Live)</option>
+                </select>
+                <p class="text-xs text-dark-500 dark:text-dark-400 mt-1">
+                  Use sandbox for testing, production for live payments
+                </p>
+              </div>
+
+              <div>
+                <label for="mpesa-consumer-key" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Consumer Key
+                </label>
+                <input
+                  id="mpesa-consumer-key"
+                  type="text"
+                  bind:value={settings.mpesa_consumer_key}
+                  class="input-field"
+                  placeholder="Your M-Pesa consumer key"
+                />
+                <p class="text-xs text-dark-500 dark:text-dark-400 mt-1">
+                  API consumer key from Safaricom developer portal
+                </p>
+              </div>
+
+              <div>
+                <label for="mpesa-consumer-secret" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Consumer Secret
+                </label>
+                <input
+                  id="mpesa-consumer-secret"
+                  type="password"
+                  bind:value={settings.mpesa_consumer_secret}
+                  class="input-field"
+                  placeholder="Your M-Pesa consumer secret"
+                />
+                <p class="text-xs text-dark-500 dark:text-dark-400 mt-1">
+                  API consumer secret from Safaricom developer portal
+                </p>
+              </div>
+
+              <div class="md:col-span-2">
+                <label for="mpesa-passkey" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
+                  Passkey
+                </label>
+                <input
+                  id="mpesa-passkey"
+                  type="password"
+                  bind:value={settings.mpesa_passkey}
+                  class="input-field"
+                  placeholder="Your M-Pesa passkey"
+                />
+                <p class="text-xs text-dark-500 dark:text-dark-400 mt-1">
+                  STK Push passkey for your business shortcode
+                </p>
+              </div>
+            </div>
+
+            <!-- Test Configuration Button -->
+            <div class="mt-4 pt-4 border-t border-dark-200 dark:border-dark-700">
+              <button
+                on:click={testMpesaConfiguration}
+                disabled={testing}
+                class="btn-outline inline-flex items-center space-x-2"
+              >
+                <TestTube class="w-4 h-4" />
+                <span>{testing ? 'Testing...' : 'Test Configuration'}</span>
+              </button>
+              <p class="text-xs text-dark-500 dark:text-dark-400 mt-2">
+                Test your M-Pesa API credentials and configuration
+              </p>
+            </div>
           </div>
 
-          <div>
-            <label for="mpesa-environment" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
-              Mpesa Environment
-            </label>
-            <select id="mpesa-environment" bind:value={settings.mpesa_environment} class="input-field">
-              <option value="sandbox">Sandbox (Testing)</option>
-              <option value="production">Production (Live)</option>
-            </select>
+          <!-- Deposit Configuration -->
+          <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+            <h4 class="font-medium text-green-900 dark:text-green-100 mb-3 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+              </svg>
+              Deposit Configuration
+            </h4>
+            <div>
+              <label for="deposit-phone-number" class="block text-sm font-medium text-green-800 dark:text-green-200 mb-2">
+                Deposit Phone Number
+              </label>
+              <input
+                id="deposit-phone-number"
+                type="tel"
+                bind:value={settings.deposit_phone_number}
+                class="input-field border-green-300 dark:border-green-700 focus:border-green-500 focus:ring-green-500"
+                placeholder="254712345678"
+              />
+              <p class="text-xs text-green-700 dark:text-green-300 mt-1">
+                Phone number where all donations will be deposited. Format: 254XXXXXXXXX
+              </p>
+            </div>
           </div>
 
-          <div>
-            <label for="minimum-donation" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
-              Minimum Donation (KES)
-            </label>
-            <input
-              id="minimum-donation"
-              type="number"
-              bind:value={settings.minimum_donation}
-              class="input-field"
-              min="1"
-            />
-          </div>
 
-          <div>
-            <label for="maximum-donation" class="block text-sm font-medium text-dark-700 dark:text-dark-300 mb-2">
-              Maximum Donation (KES)
-            </label>
-            <input
-              id="maximum-donation"
-              type="number"
-              bind:value={settings.maximum_donation}
-              class="input-field"
-              min="1"
-            />
-          </div>
         </div>
       </div>
     </div>

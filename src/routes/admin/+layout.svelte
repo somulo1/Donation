@@ -11,7 +11,8 @@
     Settings,
     LogOut,
     Menu,
-    X
+    X,
+    Smartphone
   } from 'lucide-svelte';
 
   let sidebarOpen = false;
@@ -50,6 +51,8 @@
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Projects', href: '/admin/projects', icon: FolderOpen },
     { name: 'Donations', href: '/admin/donations', icon: DollarSign },
+    { name: 'Payments', href: '/admin/payments', icon: DollarSign },
+    { name: 'M-Pesa Test', href: '/admin/mpesa-test', icon: Smartphone },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

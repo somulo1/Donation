@@ -49,8 +49,8 @@
 </script>
 
 <svelte:head>
-  <title>Login - DonateAnon</title>
-  <meta name="description" content="login for DonateAnon platform management" />
+  <title>Admin Login - DonateAnon</title>
+  <meta name="description" content="Admin login for DonateAnon platform management" />
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-dark-900 dark:to-dark-800 flex items-center justify-center section-padding">
@@ -60,6 +60,9 @@
       <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mb-4">
         <Shield class="w-8 h-8 text-white" />
       </div>
+      <h1 class="font-display text-3xl font-bold text-dark-900 dark:text-white mb-2">
+        Admin Login
+      </h1>
       <p class="text-dark-600 dark:text-dark-400">
         Access the DonateAnon administration panel
       </p>
