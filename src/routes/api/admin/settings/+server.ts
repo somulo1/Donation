@@ -114,10 +114,12 @@ export const POST: RequestHandler = async () => {
       { key: 'contact_email', value: 'admin@donateanon.com', type: 'string' },
       { key: 'mpesa_business_code', value: '174379', type: 'string' },
       { key: 'mpesa_environment', value: 'sandbox', type: 'string' },
+      { key: 'mpesa_consumer_key', value: 'uNzRpYZ8BOAQApcpuUax9WUi3cA9GqMviC0P0vUug8bGR4yT', type: 'string' },
+      { key: 'mpesa_consumer_secret', value: 'lddErn3XqkaJHWMm2zSz9o2UFADahr3Rl4L1dnbTRNGi3R7n3eJ2tNMRufbaCHTB', type: 'string' },
+      { key: 'mpesa_passkey', value: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919', type: 'string' },
+      { key: 'deposit_phone_number', value: '254712345678', type: 'string' },
       { key: 'enable_notifications', value: 'true', type: 'boolean' },
       { key: 'auto_approve_projects', value: 'false', type: 'boolean' },
-      { key: 'minimum_donation', value: '10', type: 'number' },
-      { key: 'maximum_donation', value: '1000000', type: 'number' },
       { key: 'featured_projects_limit', value: '3', type: 'number' }
     ];
 
