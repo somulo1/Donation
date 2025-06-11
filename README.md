@@ -36,7 +36,7 @@ A modern, secure, and user-friendly web application built with SvelteKit that en
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/somulo1/Donation.git
    cd Donations
    ```
 
@@ -205,7 +205,7 @@ http://localhost:5173/admin/login
 ** use the these credentials to login to admin**
 ```bash
 username: admin
-password: somulo@admin"
+password: somulo@admin
 ```
 
 ### Environment Variables
