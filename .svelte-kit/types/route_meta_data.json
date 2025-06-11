@@ -1,0 +1,45 @@
+{
+	"/": [],
+	"/about": [],
+	"/admin": [
+		"src/routes/admin/+page.ts"
+	],
+	"/admin/donations": [],
+	"/admin/login": [],
+	"/admin/projects": [],
+	"/admin/settings": [],
+	"/api/admin/login": [
+		"src/routes/api/admin/login/+server.ts"
+	],
+	"/api/admin/settings": [
+		"src/routes/api/admin/settings/+server.ts"
+	],
+	"/api/donations": [
+		"src/routes/api/donations/+server.ts"
+	],
+	"/api/donations/status": [
+		"src/routes/api/donations/status/+server.ts"
+	],
+	"/api/init": [
+		"src/routes/api/init/+server.ts"
+	],
+	"/api/mpesa/callback": [
+		"src/routes/api/mpesa/callback/+server.ts"
+	],
+	"/api/projects": [
+		"src/routes/api/projects/+server.ts"
+	],
+	"/api/projects/[id]": [
+		"src/routes/api/projects/[id]/+server.ts"
+	],
+	"/api/stats": [
+		"src/routes/api/stats/+server.ts"
+	],
+	"/api/upload/image": [
+		"src/routes/api/upload/image/+server.ts"
+	],
+	"/privacy": [],
+	"/projects": [],
+	"/projects/[id]": [],
+	"/terms": []
+}
