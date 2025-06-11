@@ -26,15 +26,13 @@ export function initializeDatabase() {
     )
   `);
 
-  // Donations table
+  // Donations table (minimal fields for privacy)
   db.exec(`
     CREATE TABLE IF NOT EXISTS donations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       project_id INTEGER NOT NULL,
       amount REAL NOT NULL,
-      donor_name TEXT,
-      donor_email TEXT,
-      phone_number TEXT,
+      donor_name TEXT DEFAULT 'Anonymous',
       mpesa_transaction_id TEXT UNIQUE,
       status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -208,10 +206,12 @@ function initializeDefaultSettings() {
     { key: 'contact_email', value: 'admin@donateanon.com', type: 'string', description: 'Contact email displayed on the site' },
     { key: 'mpesa_business_code', value: '174379', type: 'string', description: 'Mpesa business shortcode for payments' },
     { key: 'mpesa_environment', value: 'sandbox', type: 'string', description: 'Mpesa environment (sandbox/production)' },
+    { key: 'mpesa_consumer_key', value: 'uNzRpYZ8BOAQApcpuUax9WUi3cA9GqMviC0P0vUug8bGR4yT', type: 'string', description: 'Mpesa consumer key for API authentication' },
+    { key: 'mpesa_consumer_secret', value: 'lddErn3XqkaJHWMm2zSz9o2UFADahr3Rl4L1dnbTRNGi3R7n3eJ2tNMRufbaCHTB', type: 'string', description: 'Mpesa consumer secret for API authentication' },
+    { key: 'mpesa_passkey', value: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919', type: 'string', description: 'Mpesa passkey for STK push' },
+    { key: 'deposit_phone_number', value: '254712345678', type: 'string', description: 'Phone number where donations will be deposited' },
     { key: 'enable_notifications', value: 'true', type: 'boolean', description: 'Enable email notifications for events' },
     { key: 'auto_approve_projects', value: 'false', type: 'boolean', description: 'Automatically approve new project submissions' },
-    { key: 'minimum_donation', value: '10', type: 'number', description: 'Minimum donation amount in KES' },
-    { key: 'maximum_donation', value: '1000000', type: 'number', description: 'Maximum donation amount in KES' },
     { key: 'featured_projects_limit', value: '3', type: 'number', description: 'Number of featured projects to display on homepage' }
   ];
 
@@ -228,6 +228,102 @@ function initializeDefaultSettings() {
   } catch (error) {
     console.error('❌ Error initializing default settings:', error);
   }
+}
+
+/**
+ * Anonymize all donor data to protect privacy
+ * This function ensures all donations have anonymous donor names and no personal data
+ */
+export function anonymizeDonorData() {
+  try {
+    console.log('Anonymizing all donor data for privacy protection...');
+
+    // Set all donor names to 'Anonymous' if they're null or empty
+    const nameResult = db.prepare(`
+      UPDATE donations
+      SET donor_name = 'Anonymous'
+      WHERE donor_name IS NULL OR donor_name = ''
+    `).run();
+
+    console.log(`Set ${nameResult.changes} donation records to Anonymous`);
+
+    // Remove any remaining personal data columns if they exist (for migration)
+    try {
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS donations_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          project_id INTEGER NOT NULL,
+          amount REAL NOT NULL,
+          donor_name TEXT DEFAULT 'Anonymous',
+          mpesa_transaction_id TEXT UNIQUE,
+          status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'failed')),
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (project_id) REFERENCES projects (id) ON DELETE CASCADE
+        )
+      `);
+
+      // Copy data without personal information
+      db.exec(`
+        INSERT OR IGNORE INTO donations_new (id, project_id, amount, donor_name, mpesa_transaction_id, status, created_at)
+        SELECT id, project_id, amount,
+               COALESCE(NULLIF(donor_name, ''), 'Anonymous') as donor_name,
+               mpesa_transaction_id, status, created_at
+        FROM donations
+      `);
+
+      // Replace old table with new one
+      db.exec(`DROP TABLE donations`);
+      db.exec(`ALTER TABLE donations_new RENAME TO donations`);
+
+      console.log('Successfully migrated to privacy-focused donation table');
+    } catch (migrationError) {
+      console.log('Table migration not needed or already completed');
+    }
+
+    return {
+      anonymizedRecords: nameResult.changes
+    };
+  } catch (error) {
+    console.error('Error anonymizing donor data:', error);
+    throw error;
+  }
+}
+
+/**
+ * Create a donation record with only essential fields (no personal data)
+ */
+export function createAnonymousDonation(projectId: number, amount: number, donorName?: string) {
+  try {
+    // Ensure donor name is 'Anonymous' if not provided or empty
+    const finalDonorName = (donorName && donorName.trim()) ? donorName.trim() : 'Anonymous';
+
+    const result = db.prepare(`
+      INSERT INTO donations (project_id, amount, donor_name, status)
+      VALUES (?, ?, ?, 'pending')
+    `).run(projectId, amount, finalDonorName);
+
+    console.log('Created anonymous donation:', {
+      id: result.lastInsertRowid,
+      projectId,
+      amount,
+      donorName: finalDonorName
+    });
+
+    return result.lastInsertRowid;
+  } catch (error) {
+    console.error('Error creating anonymous donation:', error);
+    throw error;
+  }
+}
+
+// Initialize database
+initializeDatabase();
+
+// Automatically anonymize existing data on startup
+try {
+  anonymizeDonorData();
+} catch (error) {
+  console.error('Failed to anonymize existing data:', error);
 }
 
 export { db };

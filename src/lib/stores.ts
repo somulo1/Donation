@@ -168,10 +168,12 @@ function createSiteSettingsStore() {
     contact_email: 'admin@donateanon.com',
     mpesa_business_code: '174379',
     mpesa_environment: 'sandbox',
+    mpesa_consumer_key: 'uNzRpYZ8BOAQApcpuUax9WUi3cA9GqMviC0P0vUug8bGR4yT',
+    mpesa_consumer_secret: 'lddErn3XqkaJHWMm2zSz9o2UFADahr3Rl4L1dnbTRNGi3R7n3eJ2tNMRufbaCHTB',
+    mpesa_passkey: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+    deposit_phone_number: '254712345678',
     enable_notifications: true,
     auto_approve_projects: false,
-    minimum_donation: 10,
-    maximum_donation: 1000000,
     featured_projects_limit: 3,
     loaded: false
   });
