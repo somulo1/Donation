@@ -4,7 +4,7 @@ This directory contains comprehensive documentation for the backend architecture
 
 ## Documentation Structure
 
-### 📚 Core Documentation
+###  Core Documentation
 
 1. **[Backend Documentation](./BACKEND_DOCUMENTATION.md)**
    - Complete backend architecture overview

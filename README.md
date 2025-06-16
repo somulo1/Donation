@@ -2,7 +2,7 @@
 
 A modern, secure, and user-friendly web application built with SvelteKit that enables anonymous donations to social projects with Mpesa integration.
 
-## 🌟 Features
+##  Features
 
 ### Public Features
 - **Anonymous Donations**: Support social projects without revealing your identity
@@ -18,7 +18,7 @@ A modern, secure, and user-friendly web application built with SvelteKit that en
 - **Dashboard Analytics**: Comprehensive statistics and reporting
 - **Real-time Updates**: Live project progress and donation tracking
 
-## 🛠 Technology Stack
+##  Technology Stack
 
 - **Frontend**: SvelteKit, TypeScript, Tailwind CSS
 - **Database**: SQLite3 with better-sqlite3
@@ -26,7 +26,7 @@ A modern, secure, and user-friendly web application built with SvelteKit that en
 - **Icons**: Lucide Svelte
 - **Styling**: Custom design system with dark/light themes
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Node.js 18+ 
@@ -63,9 +63,17 @@ A modern, secure, and user-friendly web application built with SvelteKit that en
    ```
 
 5. **Open your browser**
-   Navigate to `http://localhost:5173`
 
-## 📁 Project Structure
+   * Navigate to `http://localhost:5173`
+
+   * navigate to `http://localhost:5173/admin/login` to access admin dshboard and login with the credentials provided bellow:
+   <i>
+    Username: `admin`  , 
+    Password: `somulo@admin`
+
+   </i>
+
+## Project Structure
 
 ```
 src/
@@ -93,7 +101,7 @@ src/
 └── app.css                 # Global styles and Tailwind
 ```
 
-## 🎨 Design System
+##  Design System
 
 ### Color Palette
 - **Primary**: Orange tones (#f97316) - Warm and inviting
@@ -127,7 +135,7 @@ src/
 ### Statistics
 - `GET /api/stats` - Platform statistics and analytics
 
-## 💳 Mpesa Integration
+## Mpesa Integration
 
 The platform integrates with Safaricom's Mpesa API for secure mobile payments:
 
@@ -139,7 +147,7 @@ The platform integrates with Safaricom's Mpesa API for secure mobile payments:
 ### Demo Mode
 For development and demonstration, the platform includes a mock Mpesa implementation that simulates successful payments without actual money transfer.
 
-## 🔒 Security & Privacy
+##  Security & Privacy
 
 ### Privacy Features
 - **Anonymous Donations**: No personal data stored beyond payment processing
@@ -153,7 +161,7 @@ For development and demonstration, the platform includes a mock Mpesa implementa
 - **HTTPS Enforcement**: All communications are encrypted
 - **Rate Limiting**: API endpoints are protected against abuse
 
-## 📊 Database Schema
+##  Database Schema
 
 ### Projects Table
 ```sql
@@ -187,25 +195,11 @@ CREATE TABLE donations (
 );
 ```
 
-## 🚀 Deployment
+##  Deployment
 
 ### Production Build
 ```bash
 npm run build
-```
-### access the frontend
-
-```bash
-http://localhost:5173/
-```
-### access admin dashboard
-```bash
-http://localhost:5173/admin/login
-```
-** use the these credentials to login to admin**
-```bash
-username: admin
-password: somulo@admin
 ```
 
 ### Environment Variables
@@ -219,7 +213,7 @@ Ensure all production environment variables are set:
 - **Netlify**: Static site hosting with serverless functions
 - **VPS**: Full control with Node.js hosting
 
-## 🧪 Testing
+##  Testing
 
 ### Manual Testing Checklist
 - [ ] Homepage loads with sample projects
@@ -240,11 +234,11 @@ curl http://localhost:5173/api/projects
 curl http://localhost:5173/api/stats
 ```
 
-## 📝 License
+##  License
 
 This project is created for interview purposes and demonstrates full-stack development capabilities with SvelteKit, TypeScript, and modern web technologies.
 
-## 🤝 Contributing
+##  Contributing
 
 This is an interview assignment project. For production use, consider:
 - Adding comprehensive testing suite
